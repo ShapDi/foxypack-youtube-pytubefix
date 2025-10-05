@@ -6,6 +6,8 @@ import uuid
 from enum import Enum
 from typing import List
 
+from dataclasses import dataclass
+
 import regex
 from bs4 import BeautifulSoup
 from foxypack import (
@@ -16,7 +18,9 @@ from foxypack import (
     AnswersAnalysis,
     AnswersStatistics,
 )
-from pydantic import BaseModel, Field, PrivateAttr
+from foxypack.entitys.balancers import BaseEntityBalancer
+from foxypack.entitys.pool import EntityPool
+from pydantic import BaseModel, Field
 from pytubefix import Channel, YouTube
 
 
@@ -46,9 +50,7 @@ class YoutubeVideoAnswersStatistics(AnswersStatistics):
 class HeavyYoutubeVideoAnswersStatistics(YoutubeVideoAnswersStatistics):
     pytube_ob: YouTube
 
-    model_config = {
-        "arbitrary_types_allowed": True
-    }
+    model_config = {"arbitrary_types_allowed": True}
 
 
 class ExternalLink(BaseModel):
@@ -73,12 +75,11 @@ class YouTubeChannelAnswersStatistics(AnswersStatistics):
 class HeavyYouTubeChannelAnswersStatistics(YouTubeChannelAnswersStatistics):
     pytube_ob: Channel
 
-    model_config = {
-        "arbitrary_types_allowed": True
-    }
+    model_config = {"arbitrary_types_allowed": True}
 
 
 @Storage.register_type
+@dataclass(kw_only=True)
 class YoutubeProxy(Entity):
     proxy_str: str
 
@@ -154,9 +155,15 @@ class FoxyYouTubeAnalysis(FoxyAnalysis):
 
 
 class YouTubeChannel:
-    def __init__(self, link: str, object_sn: YoutubeAnswersAnalysis, proxy=None):
+    def __init__(
+        self,
+        link: str,
+        object_sn: YoutubeAnswersAnalysis,
+        proxy: dict = None,
+        heavy_answers: bool = False,
+    ):
         self._proxy = proxy
-        self._type_data = "heavy"
+        self._heavy_answers = heavy_answers
         self._object_sn = object_sn
         self._object_channel = self.get_object_youtube(link, self._proxy)
         self.name = self._object_channel.channel_name
@@ -360,7 +367,7 @@ class YouTubeChannel:
         return self._object_channel
 
     def get_statistics(self):
-        if self._type_data == "heavy":
+        if self._heavy_answers:
             return HeavyYouTubeChannelAnswersStatistics(
                 name=self.name,
                 link=self.link,
@@ -389,7 +396,7 @@ class YouTubeChannel:
             )
 
     async def get_statistics_async(self):
-        if self._type_data == "heavy":
+        if self._heavy_answers:
             return HeavyYouTubeChannelAnswersStatistics(
                 name=self.name,
                 link=self.link,
@@ -419,9 +426,15 @@ class YouTubeChannel:
 
 
 class YouTubeVideo:
-    def __init__(self, link: str, object_sn: YoutubeAnswersAnalysis, proxy=None):
+    def __init__(
+        self,
+        link: str,
+        object_sn: YoutubeAnswersAnalysis,
+        proxy: dict | None = None,
+        heavy_answers: bool = False,
+    ):
         self._proxy = proxy
-        self._type_data = None
+        self._heavy_answers = heavy_answers
         self._object_sn = object_sn
         self._object_youtube = self.get_object_youtube(link, self._proxy)
         self.title = self._object_youtube.title
@@ -457,7 +470,7 @@ class YouTubeVideo:
         return self._object_youtube
 
     def get_statistics(self):
-        if self._type_data == "heavy":
+        if self._heavy_answers:
             return HeavyYoutubeVideoAnswersStatistics(
                 title=self.title,
                 likes=self.likes,
@@ -482,7 +495,7 @@ class YouTubeVideo:
             )
 
     async def get_statistics_async(self):
-        if self._type_data == "heavy":
+        if self._heavy_answers:
             return HeavyYoutubeVideoAnswersStatistics(
                 title=self.title,
                 likes=self.likes,
@@ -545,19 +558,62 @@ class Convert:
 
 
 class FoxyYouTubeStat(FoxyStat):
+    def __init__(
+        self,
+        entity_pool: EntityPool | None = None,
+        entity_balancer: BaseEntityBalancer | None = None,
+        heavy_answers: bool = False,
+    ):
+        self.entity_pool = entity_pool
+        self.entity_balancer = entity_balancer
+        self.heavy_answers = heavy_answers
+
     def get_stat(
         self, answers_analysis: YoutubeAnswersAnalysis
     ) -> AnswersStatistics | None:
+        try:
+            proxy = self.entity_balancer.get(YoutubeProxy)
+            self.entity_balancer.release(proxy)
+            proxy = proxy.proxy_comparison
+        except (LookupError, AttributeError):
+            proxy = None
         if answers_analysis.type_content == YouTubeEnum.channel.value:
             return YouTubeChannel(
-                link=answers_analysis.url, object_sn=answers_analysis
+                link=answers_analysis.url,
+                object_sn=answers_analysis,
+                proxy=proxy,
+                heavy_answers=self.heavy_answers,
             ).get_statistics()
         else:
             return YouTubeVideo(
-                link=answers_analysis.url, object_sn=answers_analysis
+                link=answers_analysis.url,
+                object_sn=answers_analysis,
+                proxy=proxy,
+                heavy_answers=self.heavy_answers,
             ).get_statistics()
 
     async def get_stat_async(
-        self, answers_analysis: AnswersAnalysis
+        self, answers_analysis: YoutubeAnswersAnalysis
     ) -> AnswersStatistics | None:
-        pass
+        try:
+            proxy = self.entity_balancer.get(YoutubeProxy)
+            self.entity_balancer.release(proxy)
+            proxy = proxy.proxy_comparison
+        except (LookupError, AttributeError):
+            proxy = None
+        if answers_analysis.type_content == YouTubeEnum.channel.value:
+            statistics = await YouTubeChannel(
+                link=answers_analysis.url,
+                object_sn=answers_analysis,
+                proxy=proxy,
+                heavy_answers=self.heavy_answers,
+            ).get_statistics_async()
+            return statistics
+        else:
+            statistics = await YouTubeVideo(
+                link=answers_analysis.url,
+                object_sn=answers_analysis,
+                proxy=proxy,
+                heavy_answers=self.heavy_answers,
+            ).get_statistics_async()
+            return statistics

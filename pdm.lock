@@ -2,10 +2,10 @@
 # It is not intended for manual editing.
 
 [metadata]
-groups = ["default"]
+groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:5e16679e0489d724604920ad940c26f7eaf5e8d38e03772f2ef4b176d38e3aba"
+content_hash = "sha256:326b3789dba4de076a30f3f13c0bf0ee80c434eef9599cd3df771ead2f11b2e6"
 
 [[metadata.targets]]
 requires_python = "==3.11.*"
@@ -115,17 +115,16 @@ files = [
 
 [[package]]
 name = "foxypack"
-version = "0.0.1"
+version = "0.0.4"
 requires_python = ">=3.10"
-summary = "Default template for PDM package"
+summary = "foxy interface library, entity balancing core, and shared parser"
 groups = ["default"]
 dependencies = [
     "pydantic>=2.11.9",
-    "ruff>=0.13.2",
 ]
 files = [
-    {file = "foxypack-0.0.1-py3-none-any.whl", hash = "sha256:c6697c1adf8cb95daecdeed2aa61962b799ca2f0c72e2b81a05292e3e2f467e6"},
-    {file = "foxypack-0.0.1.tar.gz", hash = "sha256:d887f1346cfb0cdc5731c2ca238f7d98b38e8173e3b691fb6ec5f64e4a1ac6cb"},
+    {file = "foxypack-0.0.4-py3-none-any.whl", hash = "sha256:97eb5f9f063ebe91ad7bd1f00673d0459b55353049656ed308ca58159ac693dc"},
+    {file = "foxypack-0.0.4.tar.gz", hash = "sha256:aabe8e5e40ccdf1d6e46845c093467af767dda7a8ab4212418d5576352ba6bf2"},
 ]
 
 [[package]]
@@ -228,7 +227,7 @@ files = [
 
 [[package]]
 name = "pydantic"
-version = "2.11.9"
+version = "2.11.10"
 requires_python = ">=3.9"
 summary = "Data validation using Python type hints"
 groups = ["default"]
@@ -239,8 +238,8 @@ dependencies = [
     "typing-inspection>=0.4.0",
 ]
 files = [
-    {file = "pydantic-2.11.9-py3-none-any.whl", hash = "sha256:c42dd626f5cfc1c6950ce6205ea58c93efa406da65f479dcb4029d5934857da2"},
-    {file = "pydantic-2.11.9.tar.gz", hash = "sha256:6b8ffda597a14812a7975c90b82a8a2e777d9257aba3453f973acd3c032a18e2"},
+    {file = "pydantic-2.11.10-py3-none-any.whl", hash = "sha256:802a655709d49bd004c31e865ef37da30b540786a46bfce02333e0e24b5fe29a"},
+    {file = "pydantic-2.11.10.tar.gz", hash = "sha256:dc280f0982fbda6c38fada4e476dc0a4f3aeaf9c6ad4c28df68a666ec3c61423"},
 ]
 
 [[package]]
@@ -322,7 +321,7 @@ name = "ruff"
 version = "0.13.3"
 requires_python = ">=3.7"
 summary = "An extremely fast Python linter and code formatter, written in Rust."
-groups = ["default"]
+groups = ["dev"]
 files = [
     {file = "ruff-0.13.3-py3-none-linux_armv6l.whl", hash = "sha256:311860a4c5e19189c89d035638f500c1e191d283d0cc2f1600c8c80d6dcd430c"},
     {file = "ruff-0.13.3-py3-none-macosx_10_12_x86_64.whl", hash = "sha256:2bdad6512fb666b40fcadb65e33add2b040fc18a24997d2e47fee7d66f7fcae2"},
