@@ -18,6 +18,7 @@ from foxypack import (
     AnswersAnalysis,
     AnswersStatistics,
 )
+from foxypack.foxypack_abc.answers import AnswersSocialContainer, AnswersSocialContent
 from foxypack.entitys.balancers import BaseEntityBalancer
 from foxypack.entitys.pool import EntityPool
 from pydantic import BaseModel, Field
@@ -35,16 +36,12 @@ class YoutubeAnswersAnalysis(AnswersAnalysis):
     code: str
 
 
-class YoutubeVideoAnswersStatistics(AnswersStatistics):
+class YoutubeVideoAnswersStatistics(AnswersSocialContent):
     answer_id: str = Field(default_factory=lambda: uuid.uuid4().hex)
-    system_id: str
     channel_id: str
-    title: str
     likes: int
     link: str
-    views: int
     channel_url: str
-    publish_date: datetime.datetime
 
 
 class HeavyYoutubeVideoAnswersStatistics(YoutubeVideoAnswersStatistics):
@@ -58,17 +55,13 @@ class ExternalLink(BaseModel):
     link: str
 
 
-class YouTubeChannelAnswersStatistics(AnswersStatistics):
+class YouTubeChannelAnswersStatistics(AnswersSocialContainer):
     answer_id: str = Field(default_factory=lambda: uuid.uuid4().hex)
-    channel_id: str
-    name: str
     link: str
     description: str
     country: str
     view_count: int
-    subscriber: int
     number_videos: int
-    data_create: datetime.date
     external_link: List[ExternalLink]
 
 
@@ -369,59 +362,63 @@ class YouTubeChannel:
     def get_statistics(self):
         if self._heavy_answers:
             return HeavyYouTubeChannelAnswersStatistics(
-                name=self.name,
+                title=self.name,
                 link=self.link,
+                system_id=self.code,
                 description=self.description,
                 country=self.country,
-                channel_id=self.code,
                 view_count=self.view_count,
-                subscriber=self.subscriber,
-                data_create=self.data_create,
+                subscribers=self.subscriber,
+                creation_date=self.data_create,
                 number_videos=self.number_videos,
                 pytube_ob=self.object_channel,
                 external_link=self.external_links,
+                analysis_status=self._object_sn,
             )
         else:
             return YouTubeChannelAnswersStatistics(
-                name=self.name,
+                title=self.name,
                 link=self.link,
                 description=self.description,
                 country=self.country,
-                channel_id=self.code,
+                system_id=self.code,
                 view_count=self.view_count,
-                subscriber=self.subscriber,
-                data_create=self.data_create,
+                subscribers=self.subscriber,
+                creation_date=self.data_create,
                 number_videos=self.number_videos,
                 external_link=self.external_links,
+                analysis_status=self._object_sn,
             )
 
     async def get_statistics_async(self):
         if self._heavy_answers:
             return HeavyYouTubeChannelAnswersStatistics(
-                name=self.name,
+                title=self.name,
                 link=self.link,
                 description=self.description,
                 country=self.country,
-                channel_id=self.code,
+                system_id=self.code,
                 view_count=self.view_count,
-                subscriber=self.subscriber,
-                data_create=self.data_create,
+                subscribers=self.subscriber,
+                creation_date=self.data_create,
                 number_videos=self.number_videos,
                 pytube_ob=self.object_channel,
                 external_link=self.external_links,
+                analysis_status=self._object_sn,
             )
         else:
             return YouTubeChannelAnswersStatistics(
-                name=self.name,
+                title=self.name,
                 link=self.link,
                 description=self.description,
                 country=self.country,
-                channel_id=self.code,
+                system_id=self.code,
                 view_count=self.view_count,
-                subscriber=self.subscriber,
-                data_create=self.data_create,
+                subscribers=self.subscriber,
+                creation_date=self.data_create,
                 number_videos=self.number_videos,
                 external_link=self.external_links,
+                analysis_status=self._object_sn,
             )
 
 
@@ -445,6 +442,7 @@ class YouTubeVideo:
         self.system_id = self._object_youtube.video_id
         self.channel_url = self._object_youtube.channel_url
         self.publish_date = self._object_youtube.publish_date
+
 
     @staticmethod
     def get_object_youtube(link, proxy) -> YouTube:
@@ -479,8 +477,9 @@ class YouTubeVideo:
                 views=self.views,
                 system_id=self.system_id,
                 channel_url=self.channel_url,
-                publish_date=self.publish_date,
+                publish_date=self.publish_date.date(),
                 pytube_ob=self.object_youtube,
+                analysis_status=self._object_sn,
             )
         else:
             return YoutubeVideoAnswersStatistics(
@@ -491,7 +490,8 @@ class YouTubeVideo:
                 views=self.views,
                 system_id=self.system_id,
                 channel_url=self.channel_url,
-                publish_date=self.publish_date,
+                publish_date=self.publish_date.date(),
+                analysis_status=self._object_sn,
             )
 
     async def get_statistics_async(self):
@@ -504,8 +504,9 @@ class YouTubeVideo:
                 views=self.views,
                 system_id=self.system_id,
                 channel_url=self.channel_url,
-                publish_date=self.publish_date,
+                publish_date=self.publish_date.date(),
                 pytube_ob=self.object_youtube,
+                analysis_status=self._object_sn,
             )
         else:
             return YoutubeVideoAnswersStatistics(
@@ -516,7 +517,8 @@ class YouTubeVideo:
                 views=self.views,
                 system_id=self.system_id,
                 channel_url=self.channel_url,
-                publish_date=self.publish_date,
+                publish_date=self.publish_date.date(),
+                analysis_status=self._object_sn,
             )
 
 
