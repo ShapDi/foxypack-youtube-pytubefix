@@ -1,6 +1,6 @@
 [project]
 name = "foxypack-youtube-pytubefix"
-version = "0.0.4"
+version = "0.0.5"
 description = "YouTube Support Library for foxypack"
 authors = [
     {name = "shapdi", email = "shapranov.work@gmail.com"},

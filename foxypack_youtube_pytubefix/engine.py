@@ -42,6 +42,7 @@ class YoutubeVideoAnswersStatistics(AnswersSocialContent):
     likes: int
     link: str
     channel_url: str
+    duration: int
 
 
 class HeavyYoutubeVideoAnswersStatistics(YoutubeVideoAnswersStatistics):
@@ -440,6 +441,7 @@ class YouTubeVideo:
         self.code = self._object_youtube.channel_id
         self.views = self._object_youtube.views
         self.system_id = self._object_youtube.video_id
+        self.duration = self._object_youtube.length
         self.channel_url = self._object_youtube.channel_url
         self.publish_date = self._object_youtube.publish_date
 
@@ -479,6 +481,7 @@ class YouTubeVideo:
                 channel_url=self.channel_url,
                 publish_date=self.publish_date.date(),
                 pytube_ob=self.object_youtube,
+                duration= self.duration,
                 analysis_status=self._object_sn,
             )
         else:
@@ -490,6 +493,7 @@ class YouTubeVideo:
                 views=self.views,
                 system_id=self.system_id,
                 channel_url=self.channel_url,
+                duration=self.duration,
                 publish_date=self.publish_date.date(),
                 analysis_status=self._object_sn,
             )
