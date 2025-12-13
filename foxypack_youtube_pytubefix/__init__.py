@@ -1,7 +1,9 @@
-from foxypack_youtube_pytubefix.engine import (
-    YoutubeProxy,
-    FoxyYouTubeAnalysis,
+from foxypack_youtube_pytubefix.foxyanalysis import (
+    FoxyYouTubeAnalysis
+)
+
+from foxypack_youtube_pytubefix.foxystat import (
     FoxyYouTubeStat,
 )
 
-__all__ = [YoutubeProxy, FoxyYouTubeAnalysis, FoxyYouTubeStat]
+__all__ = ["FoxyYouTubeAnalysis", "FoxyYouTubeStat"]

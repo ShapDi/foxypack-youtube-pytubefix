@@ -16,6 +16,7 @@ repository = "https://github.com/ShapDi/foxypack-youtube-pytubefix"
 [project.optional-dependencies]
 dev = [
     "ruff>=0.13.3",
+    "mypy>=1.19.0",
 ]
 [tool.pdm]
 distribution = true

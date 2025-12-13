@@ -1,136 +1,15 @@
-import datetime
 import json
 import re
-import urllib.parse
-import uuid
-from enum import Enum
-from typing import List
-
-from dataclasses import dataclass
+import datetime
 
 import regex
 from bs4 import BeautifulSoup
-from foxypack import (
-    FoxyStat,
-    FoxyAnalysis,
-    AnswersAnalysis,
-    AnswersStatistics,
-)
-from foxypack.foxypack_abc.answers import AnswersSocialContainer, AnswersSocialContent
-from pydantic import BaseModel, Field
+from foxypack import FoxyStat, AnswersStatistics
 from pytubefix import Channel, YouTube
 
-
-class YouTubeEnum(Enum):
-    shorts = "shorts"
-    video = "video"
-    channel = "channel"
-
-
-class YoutubeAnswersAnalysis(AnswersAnalysis):
-    answer_id: str = Field(default_factory=lambda: uuid.uuid4().hex)
-    code: str
-
-
-class YoutubeVideoAnswersStatistics(AnswersSocialContent):
-    answer_id: str = Field(default_factory=lambda: uuid.uuid4().hex)
-    channel_id: str
-    likes: int
-    link: str
-    channel_url: str
-    duration: int
-
-
-class HeavyYoutubeVideoAnswersStatistics(YoutubeVideoAnswersStatistics):
-    pytube_ob: YouTube
-
-    model_config = {"arbitrary_types_allowed": True}
-
-
-class ExternalLink(BaseModel):
-    title: str
-    link: str
-
-
-class YouTubeChannelAnswersStatistics(AnswersSocialContainer):
-    answer_id: str = Field(default_factory=lambda: uuid.uuid4().hex)
-    link: str
-    description: str
-    country: str
-    view_count: int
-    number_videos: int
-    external_link: List[ExternalLink]
-
-
-class HeavyYouTubeChannelAnswersStatistics(YouTubeChannelAnswersStatistics):
-    pytube_ob: Channel
-
-    model_config = {"arbitrary_types_allowed": True}
-
-
-
-class FoxyYouTubeAnalysis(FoxyAnalysis):
-    @staticmethod
-    def get_code(link):
-        parsed_url = urllib.parse.urlparse(link)
-        if "watch" in parsed_url.path:
-            query_params = urllib.parse.parse_qs(parsed_url.query)
-            return query_params.get("v")[0].split("?")[0]
-        elif "shorts" in parsed_url.path:
-            return parsed_url.path.split("/shorts/")[1].split("?")[0]
-        elif "@" in parsed_url.path:
-            return parsed_url.path.split("@")[1]
-        elif "channel" in parsed_url.path:
-            return parsed_url.path.split("channel/")[1]
-        elif "/" in parsed_url.path:
-            return parsed_url.path.split("/")[1]
-        return None
-
-    @staticmethod
-    def clean_link(link):
-        parsed_url = urllib.parse.urlparse(link)
-        if "watch" in parsed_url.path:
-            query_params = urllib.parse.parse_qs(parsed_url.query)
-            return (
-                f"https://youtube.com/watch?v={query_params.get('v')[0].split('?')[0]}"
-            )
-        elif "shorts" in parsed_url.path:
-            shorts_id = parsed_url.path.split("/shorts/")[1].split("?")[0]
-            return f"https://youtube.com/watch?v={shorts_id}"
-        elif "@" in parsed_url.path:
-            return f"https://www.youtube.com/@{parsed_url.path.split('@')[1]}"
-        elif "channel" in parsed_url.path:
-            return (
-                f"https://www.youtube.com/channel{parsed_url.path.split('channel')[1]}"
-            )
-        elif "/" in parsed_url.path:
-            shorts_id = parsed_url.path.split("/")[1]
-            return f"https://youtube.com/watch?v={shorts_id}"
-        return parsed_url.scheme + "://" + parsed_url.netloc + parsed_url.path
-
-    @staticmethod
-    def get_type_content(link):
-        parsed_url = urllib.parse.urlparse(link)
-        if "watch" in parsed_url.path:
-            return YouTubeEnum.video.value
-        if "youtu.be" in parsed_url.netloc:
-            return YouTubeEnum.video.value
-        elif "shorts" in parsed_url.path:
-            return YouTubeEnum.shorts.value
-        elif "@" in parsed_url.path or "channel" in parsed_url.path:
-            return YouTubeEnum.channel.value
-        return None
-
-    def get_analysis(self, url: str) -> AnswersAnalysis | None:
-        type_content = self.get_type_content(url)
-        if type_content is None:
-            return None
-        return YoutubeAnswersAnalysis(
-            url=self.clean_link(url),
-            social_platform="youtube",
-            type_content=type_content,
-            code=self.get_code(url),
-        )
+from foxypack_youtube_pytubefix.answers import YoutubeAnswersAnalysis, ExternalLink, \
+    HeavyYouTubeChannelAnswersStatistics, YouTubeChannelAnswersStatistics, HeavyYoutubeVideoAnswersStatistics, \
+    YoutubeVideoAnswersStatistics, YouTubeEnum
 
 
 class YouTubeChannel:
@@ -551,23 +430,14 @@ class Convert:
 class FoxyYouTubeStat(FoxyStat):
     def __init__(
         self,
-        entity_pool: EntityPool | None = None,
-        entity_balancer: BaseEntityBalancer | None = None,
         heavy_answers: bool = False,
     ):
-        self.entity_pool = entity_pool
-        self.entity_balancer = entity_balancer
         self.heavy_answers = heavy_answers
 
-    def get_stat(
+    def get_statistics(
         self, answers_analysis: YoutubeAnswersAnalysis
     ) -> AnswersStatistics | None:
-        try:
-            proxy = self.entity_balancer.get(YoutubeProxy)
-            self.entity_balancer.release(proxy)
-            proxy = proxy.proxy_comparison
-        except (LookupError, AttributeError):
-            proxy = None
+        proxy = None
         if answers_analysis.type_content == YouTubeEnum.channel.value:
             return YouTubeChannel(
                 link=answers_analysis.url,
@@ -583,15 +453,10 @@ class FoxyYouTubeStat(FoxyStat):
                 heavy_answers=self.heavy_answers,
             ).get_statistics()
 
-    async def get_stat_async(
+    async def get_statistics_async(
         self, answers_analysis: YoutubeAnswersAnalysis
     ) -> AnswersStatistics | None:
-        try:
-            proxy = self.entity_balancer.get(YoutubeProxy)
-            self.entity_balancer.release(proxy)
-            proxy = proxy.proxy_comparison
-        except (LookupError, AttributeError):
-            proxy = None
+        proxy = None
         if answers_analysis.type_content == YouTubeEnum.channel.value:
             statistics = await YouTubeChannel(
                 link=answers_analysis.url,
