@@ -1,4 +1,4 @@
-from foxypack_youtube_pytubefix.foxystat import YouTubeVideo
+from foxypack_youtube_pytubefix.foxystat import YouTubeVideo, YouTubeChannel
 from foxypack_youtube_pytubefix.foxyanalysis import FoxyYouTubeAnalysis
 
-__all__ = ["FoxyYouTubeAnalysis", "YouTubeVideo"]
+__all__ = ["FoxyYouTubeAnalysis", "YouTubeVideo", "YouTubeChannel"]
