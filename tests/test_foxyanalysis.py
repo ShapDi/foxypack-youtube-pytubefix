@@ -1,7 +1,6 @@
 import pytest
 from foxypack_youtube_pytubefix import FoxyYouTubeAnalysis
 
-from foxypack_youtube_pytubefix.answers import YoutubeAnswersAnalysis
 
 
 @pytest.fixture(scope="session")

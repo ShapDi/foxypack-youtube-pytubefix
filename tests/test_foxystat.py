@@ -22,6 +22,7 @@ def test_get_statistics_video_one_link_format():
     assert stat_one.channel_url == stat_two.channel_url
     assert stat_one.duration == stat_two.duration
 
+
 def test_get_statistics_video_two_link_format():
     """Test case for getting statistics for a video"""
     youtube_stat = YouTubeVideo()
@@ -42,6 +43,7 @@ def test_get_statistics_video_two_link_format():
     assert stat_one.link == stat_two.link
     assert stat_one.channel_url == stat_two.channel_url
     assert stat_one.duration == stat_two.duration
+
 
 def test_get_statistics_video_three_link_format():
     """Test case for getting statistics for a video"""
@@ -86,6 +88,7 @@ def test_get_statistics_channel_foxy_stat():
     assert stat_one.number_videos == stat_two.number_videos
     assert stat_one.external_link == stat_two.external_link
     assert stat_one.analysis_status == stat_two.analysis_status
+
 
 def test_get_statistics_channel_foxy_stat_two():
     """Test case for getting statistics for a channel"""

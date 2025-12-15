@@ -1,4 +1,3 @@
-import uuid
 from enum import Enum
 from typing import List
 
@@ -7,7 +6,7 @@ from foxypack.foxypack_abc.answers import (
     AnswersAnalysis,
     AnswersSocialContent,
 )
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from pytubefix import YouTube, Channel
 
 

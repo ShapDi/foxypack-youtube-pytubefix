@@ -166,21 +166,23 @@ class YouTubeChannel(FoxyStat):
 
     def get_country(self, object_channel: Channel) -> str:
         data = self.get_base_con(object_channel)
-        text_country = str((
-            data[0]
-            .get("showEngagementPanelEndpoint")
-            .get("engagementPanel")
-            .get("engagementPanelSectionListRenderer")
-            .get("content")
-            .get("sectionListRenderer")
-            .get("contents")[0]
-            .get("itemSectionRenderer")
-            .get("contents")[0]
-            .get("aboutChannelRenderer")
-            .get("metadata")
-            .get("aboutChannelViewModel")
-            .get("country")
-        ))
+        text_country = str(
+            (
+                data[0]
+                .get("showEngagementPanelEndpoint")
+                .get("engagementPanel")
+                .get("engagementPanelSectionListRenderer")
+                .get("content")
+                .get("sectionListRenderer")
+                .get("contents")[0]
+                .get("itemSectionRenderer")
+                .get("contents")[0]
+                .get("aboutChannelRenderer")
+                .get("metadata")
+                .get("aboutChannelViewModel")
+                .get("country")
+            )
+        )
         return text_country
 
     def get_view_count(self, object_youtube: Channel) -> int:
@@ -266,21 +268,23 @@ class YouTubeChannel(FoxyStat):
 
     def get_description(self, object_youtube: Channel) -> str:
         data = self.get_base_con(object_youtube)
-        text_description = str((
-            data[0]
-            .get("showEngagementPanelEndpoint")
-            .get("engagementPanel")
-            .get("engagementPanelSectionListRenderer")
-            .get("content")
-            .get("sectionListRenderer")
-            .get("contents")[0]
-            .get("itemSectionRenderer")
-            .get("contents")[0]
-            .get("aboutChannelRenderer")
-            .get("metadata")
-            .get("aboutChannelViewModel")
-            .get("description")
-        ))
+        text_description = str(
+            (
+                data[0]
+                .get("showEngagementPanelEndpoint")
+                .get("engagementPanel")
+                .get("engagementPanelSectionListRenderer")
+                .get("content")
+                .get("sectionListRenderer")
+                .get("contents")[0]
+                .get("itemSectionRenderer")
+                .get("contents")[0]
+                .get("aboutChannelRenderer")
+                .get("metadata")
+                .get("aboutChannelViewModel")
+                .get("description")
+            )
+        )
         return text_description
 
     def get_external_links(self, object_youtube: Channel) -> list[ExternalLink]:

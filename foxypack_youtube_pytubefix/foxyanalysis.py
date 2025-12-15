@@ -1,6 +1,6 @@
 import urllib.parse
 
-from foxypack import FoxyAnalysis, AnswersAnalysis, DenialAnalyticsException
+from foxypack import FoxyAnalysis, DenialAnalyticsException
 
 from foxypack_youtube_pytubefix.answers import YoutubeAnswersAnalysis, YouTubeEnum
 
