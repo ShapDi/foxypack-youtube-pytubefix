@@ -4,15 +4,26 @@ import datetime
 
 import regex
 from bs4 import BeautifulSoup
-from foxypack import FoxyStat, AnswersStatistics
+from foxypack import (
+    FoxyStat,
+    AnswersStatistics,
+    AnswersAnalysis,
+    InternalCollectionException,
+)
 from pytubefix import Channel, YouTube
 
-from foxypack_youtube_pytubefix.answers import YoutubeAnswersAnalysis, ExternalLink, \
-    HeavyYouTubeChannelAnswersStatistics, YouTubeChannelAnswersStatistics, HeavyYoutubeVideoAnswersStatistics, \
-    YoutubeVideoAnswersStatistics, YouTubeEnum
+from foxypack_youtube_pytubefix.answers import (
+    YoutubeAnswersAnalysis,
+    ExternalLink,
+    HeavyYouTubeChannelAnswersStatistics,
+    YouTubeChannelAnswersStatistics,
+    HeavyYoutubeVideoAnswersStatistics,
+    YoutubeVideoAnswersStatistics,
+    YouTubeEnum,
+)
 
 
-class YouTubeChannel:
+class YouTubeChannelOld:
     def __init__(
         self,
         link: str,
@@ -287,7 +298,7 @@ class YouTubeChannel:
             )
 
 
-class YouTubeVideo:
+class YouTubeVideoOld:
     def __init__(
         self,
         link: str,
@@ -308,7 +319,6 @@ class YouTubeVideo:
         self.duration = self._object_youtube.length
         self.channel_url = self._object_youtube.channel_url
         self.publish_date = self._object_youtube.publish_date
-
 
     @staticmethod
     def get_object_youtube(link, proxy) -> YouTube:
@@ -345,7 +355,7 @@ class YouTubeVideo:
                 channel_url=self.channel_url,
                 publish_date=self.publish_date.date(),
                 pytube_ob=self.object_youtube,
-                duration= self.duration,
+                duration=self.duration,
                 analysis_status=self._object_sn,
             )
         else:
@@ -390,7 +400,7 @@ class YouTubeVideo:
             )
 
 
-class Convert:
+class ConvertOld:
     @staticmethod
     def convert_views_to_int(views_str: str) -> int:
         try:
@@ -427,7 +437,7 @@ class Convert:
         return joined_date
 
 
-class FoxyYouTubeStat(FoxyStat):
+class FoxyYouTubeStatOld(FoxyStat):
     def __init__(
         self,
         heavy_answers: bool = False,
@@ -439,14 +449,14 @@ class FoxyYouTubeStat(FoxyStat):
     ) -> AnswersStatistics | None:
         proxy = None
         if answers_analysis.type_content == YouTubeEnum.channel.value:
-            return YouTubeChannel(
+            return YouTubeChannelOld(
                 link=answers_analysis.url,
                 object_sn=answers_analysis,
                 proxy=proxy,
                 heavy_answers=self.heavy_answers,
             ).get_statistics()
         else:
-            return YouTubeVideo(
+            return YouTubeVideoOld(
                 link=answers_analysis.url,
                 object_sn=answers_analysis,
                 proxy=proxy,
@@ -458,7 +468,7 @@ class FoxyYouTubeStat(FoxyStat):
     ) -> AnswersStatistics | None:
         proxy = None
         if answers_analysis.type_content == YouTubeEnum.channel.value:
-            statistics = await YouTubeChannel(
+            statistics = await YouTubeChannelOld(
                 link=answers_analysis.url,
                 object_sn=answers_analysis,
                 proxy=proxy,
@@ -466,10 +476,112 @@ class FoxyYouTubeStat(FoxyStat):
             ).get_statistics_async()
             return statistics
         else:
-            statistics = await YouTubeVideo(
+            statistics = await YouTubeVideoOld(
                 link=answers_analysis.url,
                 object_sn=answers_analysis,
                 proxy=proxy,
                 heavy_answers=self.heavy_answers,
             ).get_statistics_async()
             return statistics
+
+
+class FoxyYouTubeStat(FoxyStat):
+    def get_statistics(self, answers_analysis: AnswersAnalysis) -> AnswersStatistics:
+        pass
+
+
+class YouTubeVideo(FoxyStat):
+    def __init__(
+        self,
+        heavy_answers: bool = False,
+    ):
+        self._heavy_answers = heavy_answers
+
+    @staticmethod
+    def get_object_youtube(link: str) -> YouTube:
+        youtube = YouTube(link, "WEB")
+        return youtube
+
+    @staticmethod
+    def get_like_num(youtube: YouTube) -> bool | int:
+        like_template = r"like this video along with (.*?) other people"
+        text = str(youtube.initial_data)
+        matches = re.findall(like_template, text, re.MULTILINE)
+        if len(matches) >= 1:
+            like_str = matches[0]
+            return int(like_str.replace(",", ""))
+        return False
+
+    def get_statistics(
+        self, object_analysis: YoutubeAnswersAnalysis
+    ) -> HeavyYoutubeVideoAnswersStatistics | YoutubeVideoAnswersStatistics:
+        if object_analysis.social_platform != "youtube" and (
+            object_analysis.social_platform != "shorts"
+            or object_analysis.social_platform != "video"
+        ):
+            raise InternalCollectionException
+        object_youtube = self.get_object_youtube(object_analysis.url)
+        if self._heavy_answers:
+            return HeavyYoutubeVideoAnswersStatistics(
+                title=object_youtube.title,
+                likes=self.get_like_num(object_youtube),
+                link=object_youtube.watch_url,
+                channel_id=object_youtube.channel_id,
+                views=object_youtube.views,
+                system_id=object_youtube.video_id,
+                channel_url=object_youtube.channel_url,
+                publish_date=object_youtube.publish_date.date(),
+                pytube_ob=object_youtube,
+                duration=object_youtube.length,
+                analysis_status=object_analysis,
+            )
+        else:
+            return YoutubeVideoAnswersStatistics(
+                title=object_youtube.title,
+                likes=self.get_like_num(object_youtube),
+                link=object_youtube.watch_url,
+                channel_id=object_youtube.channel_id,
+                views=object_youtube.views,
+                system_id=object_youtube.video_id,
+                channel_url=object_youtube.channel_url,
+                publish_date=object_youtube.publish_date.date(),
+                duration=object_youtube.length,
+                analysis_status=object_analysis,
+            )
+
+    async def get_statistics_async(
+        self, object_analysis: YoutubeAnswersAnalysis
+    ) -> HeavyYoutubeVideoAnswersStatistics | YoutubeVideoAnswersStatistics:
+        if object_analysis.social_platform != "youtube" and (
+            object_analysis.social_platform != "shorts"
+            or object_analysis.social_platform != "video"
+        ):
+            raise InternalCollectionException
+        object_youtube = self.get_object_youtube(object_analysis.url)
+        if self._heavy_answers:
+            return HeavyYoutubeVideoAnswersStatistics(
+                title=object_youtube.title,
+                likes=self.get_like_num(object_youtube),
+                link=object_youtube.watch_url,
+                channel_id=object_youtube.channel_id,
+                views=object_youtube.views,
+                system_id=object_youtube.video_id,
+                channel_url=object_youtube.channel_url,
+                publish_date=object_youtube.publish_date.date(),
+                pytube_ob=object_youtube,
+                duration=object_youtube.length,
+                analysis_status=self._object_analysis,
+            )
+        else:
+            return YoutubeVideoAnswersStatistics(
+                title=object_youtube.title,
+                likes=self.get_like_num(object_youtube),
+                link=object_youtube.watch_url,
+                channel_id=object_youtube.channel_id,
+                views=object_youtube.views,
+                system_id=object_youtube.video_id,
+                channel_url=object_youtube.channel_url,
+                publish_date=object_youtube.publish_date.date(),
+                duration=object_youtube.length,
+                analysis_status=self._object_analysis,
+            )

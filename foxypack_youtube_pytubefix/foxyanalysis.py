@@ -1,18 +1,18 @@
 import urllib.parse
-from enum import Enum
 
-from foxypack import FoxyAnalysis, AnswersAnalysis
+from foxypack import FoxyAnalysis, AnswersAnalysis, DenialAnalyticsException
 
 from foxypack_youtube_pytubefix.answers import YoutubeAnswersAnalysis, YouTubeEnum
 
 
 class FoxyYouTubeAnalysis(FoxyAnalysis):
     @staticmethod
-    def get_code(link):
+    def get_code(link: str) -> str | None:
         parsed_url = urllib.parse.urlparse(link)
         if "watch" in parsed_url.path:
-            query_params = urllib.parse.parse_qs(parsed_url.query)
-            return query_params.get("v")[0].split("?")[0]
+            query_params = urllib.parse.parse_qs(parsed_url.query).get("v")
+            if query_params is not None:
+                return query_params[0].split("?")[0]
         elif "shorts" in parsed_url.path:
             return parsed_url.path.split("/shorts/")[1].split("?")[0]
         elif "@" in parsed_url.path:
@@ -24,13 +24,12 @@ class FoxyYouTubeAnalysis(FoxyAnalysis):
         return None
 
     @staticmethod
-    def clean_link(link):
+    def clean_link(link: str) -> str:
         parsed_url = urllib.parse.urlparse(link)
         if "watch" in parsed_url.path:
-            query_params = urllib.parse.parse_qs(parsed_url.query)
-            return (
-                f"https://youtube.com/watch?v={query_params.get('v')[0].split('?')[0]}"
-            )
+            query_params = urllib.parse.parse_qs(parsed_url.query).get("v")
+            if query_params is not None:
+                return f"https://youtube.com/watch?v={query_params[0].split('?')[0]}"
         elif "shorts" in parsed_url.path:
             shorts_id = parsed_url.path.split("/shorts/")[1].split("?")[0]
             return f"https://youtube.com/watch?v={shorts_id}"
@@ -46,7 +45,7 @@ class FoxyYouTubeAnalysis(FoxyAnalysis):
         return parsed_url.scheme + "://" + parsed_url.netloc + parsed_url.path
 
     @staticmethod
-    def get_type_content(link):
+    def get_type_content(link: str) -> str | None:
         parsed_url = urllib.parse.urlparse(link)
         if "watch" in parsed_url.path:
             return YouTubeEnum.video.value
@@ -58,10 +57,10 @@ class FoxyYouTubeAnalysis(FoxyAnalysis):
             return YouTubeEnum.channel.value
         return None
 
-    def get_analysis(self, url: str) -> AnswersAnalysis | None:
+    def get_analysis(self, url: str) -> YoutubeAnswersAnalysis:
         type_content = self.get_type_content(url)
         if type_content is None:
-            return None
+            raise DenialAnalyticsException(url)
         return YoutubeAnswersAnalysis(
             url=self.clean_link(url),
             social_platform="youtube",

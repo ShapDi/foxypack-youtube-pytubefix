@@ -2,9 +2,14 @@ import uuid
 from enum import Enum
 from typing import List
 
-from foxypack.foxypack_abc.answers import AnswersSocialContainer, AnswersAnalysis, AnswersSocialContent
+from foxypack.foxypack_abc.answers import (
+    AnswersSocialContainer,
+    AnswersAnalysis,
+    AnswersSocialContent,
+)
 from pydantic import BaseModel, Field
 from pytubefix import YouTube, Channel
+
 
 class YouTubeEnum(Enum):
     shorts = "shorts"

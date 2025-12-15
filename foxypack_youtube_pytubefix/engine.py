@@ -68,7 +68,6 @@ class HeavyYouTubeChannelAnswersStatistics(YouTubeChannelAnswersStatistics):
     model_config = {"arbitrary_types_allowed": True}
 
 
-
 class FoxyYouTubeAnalysis(FoxyAnalysis):
     @staticmethod
     def get_code(link):
@@ -430,7 +429,6 @@ class YouTubeVideo:
         self.channel_url = self._object_youtube.channel_url
         self.publish_date = self._object_youtube.publish_date
 
-
     @staticmethod
     def get_object_youtube(link, proxy) -> YouTube:
         youtube = YouTube(link, "WEB", proxies=proxy)
@@ -466,7 +464,7 @@ class YouTubeVideo:
                 channel_url=self.channel_url,
                 publish_date=self.publish_date.date(),
                 pytube_ob=self.object_youtube,
-                duration= self.duration,
+                duration=self.duration,
                 analysis_status=self._object_sn,
             )
         else:
