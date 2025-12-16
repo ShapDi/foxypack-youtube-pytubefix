@@ -1,13 +1,14 @@
 import urllib.parse
 
 from foxypack import FoxyAnalysis, DenialAnalyticsException
+from typing_extensions import override
 
 from foxypack_youtube_pytubefix.answers import YoutubeAnswersAnalysis, YouTubeEnum
 
 
 class FoxyYouTubeAnalysis(FoxyAnalysis):
     @staticmethod
-    def get_code(link: str) -> str | None:
+    def get_code(link: str) -> str:
         parsed_url = urllib.parse.urlparse(link)
         if "watch" in parsed_url.path:
             query_params = urllib.parse.parse_qs(parsed_url.query).get("v")
@@ -21,7 +22,7 @@ class FoxyYouTubeAnalysis(FoxyAnalysis):
             return parsed_url.path.split("channel/")[1]
         elif "/" in parsed_url.path:
             return parsed_url.path.split("/")[1]
-        return None
+        return ""
 
     @staticmethod
     def clean_link(link: str) -> str:
@@ -57,6 +58,7 @@ class FoxyYouTubeAnalysis(FoxyAnalysis):
             return YouTubeEnum.channel.value
         return None
 
+    @override
     def get_analysis(self, url: str) -> YoutubeAnswersAnalysis:
         type_content = self.get_type_content(url)
         if type_content is None:

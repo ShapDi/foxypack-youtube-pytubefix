@@ -2,7 +2,6 @@ import pytest
 from foxypack_youtube_pytubefix import FoxyYouTubeAnalysis
 
 
-
 @pytest.fixture(scope="session")
 def content_analyzer():
     return FoxyYouTubeAnalysis()

@@ -8,11 +8,12 @@ from bs4 import BeautifulSoup, ResultSet, Tag
 from foxypack import (
     FoxyStat,
     InternalCollectionException,
+    AnswersAnalysis,
 )
 from pytubefix import Channel, YouTube
+from typing_extensions import override
 
 from foxypack_youtube_pytubefix.answers import (
-    YoutubeAnswersAnalysis,
     ExternalLink,
     HeavyYouTubeChannelAnswersStatistics,
     YouTubeChannelAnswersStatistics,
@@ -43,8 +44,9 @@ class YouTubeVideo(FoxyStat):
             return int(like_str.replace(",", ""))
         return False
 
+    @override
     def get_statistics(
-        self, object_analysis: YoutubeAnswersAnalysis
+        self, object_analysis: AnswersAnalysis
     ) -> HeavyYoutubeVideoAnswersStatistics | YoutubeVideoAnswersStatistics:
         if object_analysis.social_platform != "youtube" and (
             object_analysis.social_platform != "shorts"
@@ -80,8 +82,9 @@ class YouTubeVideo(FoxyStat):
                 analysis_status=object_analysis,
             )
 
+    @override
     async def get_statistics_async(
-        self, object_analysis: YoutubeAnswersAnalysis
+        self, object_analysis: AnswersAnalysis
     ) -> HeavyYoutubeVideoAnswersStatistics | YoutubeVideoAnswersStatistics:
         if object_analysis.social_platform != "youtube" and (
             object_analysis.social_platform != "shorts"
@@ -315,7 +318,7 @@ class YouTubeChannel(FoxyStat):
         ]
 
     def get_statistics(
-        self, object_analysis: YoutubeAnswersAnalysis
+        self, object_analysis: AnswersAnalysis
     ) -> HeavyYouTubeChannelAnswersStatistics | YouTubeChannelAnswersStatistics:
         if (
             object_analysis.social_platform != "youtube"
@@ -354,7 +357,7 @@ class YouTubeChannel(FoxyStat):
             )
 
     async def get_statistics_async(
-        self, object_analysis: YoutubeAnswersAnalysis
+        self, object_analysis: AnswersAnalysis
     ) -> HeavyYouTubeChannelAnswersStatistics | YouTubeChannelAnswersStatistics:
         if (
             object_analysis.social_platform != "youtube"
