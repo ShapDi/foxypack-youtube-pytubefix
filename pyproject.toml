@@ -5,7 +5,7 @@ description = "YouTube Support Library for foxypack"
 authors = [
     {name = "shapdi", email = "shapranov.work@gmail.com"},
 ]
-dependencies = ["foxypack>=0.0.11", "pytubefix>=10.3.6", "regex>=2025.9.18", "beautifulsoup4>=4.14.2", "git+ssh://git@github.com/ShapDi/foxy-entities.git"]
+dependencies = ["foxypack>=0.0.11", "pytubefix>=10.3.6", "regex>=2025.9.18", "beautifulsoup4>=4.14.2", "foxy-entities>=0.0.3"]
 requires-python = ">=3.10"
 readme = "README.md"
 license = {text = "MIT"}

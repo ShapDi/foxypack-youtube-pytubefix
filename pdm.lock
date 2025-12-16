@@ -5,7 +5,7 @@
 groups = ["default", "dev", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:914e58a9ba49b7f6a617e8b6895b01d8ec85930c33f2bf28e962f9dcc1f6b654"
+content_hash = "sha256:e907499d2314e3c261d8214748d304073b362d7aaf7b6d0a80913b798af7a736"
 
 [[metadata.targets]]
 requires_python = "==3.11.*"
@@ -135,13 +135,15 @@ files = [
 name = "foxy-entities"
 version = "0.0.3"
 requires_python = ">=3.11"
-git = "ssh://git@github.com/ShapDi/foxy-entities.git"
-revision = "19ec3eaa91205b2aeb5950741f09cdf2a2af1e66"
 summary = "Library for managing social media entities"
 groups = ["default"]
 marker = "python_version == \"3.11\""
 dependencies = [
     "pydantic>=2.12.5",
+]
+files = [
+    {file = "foxy_entities-0.0.3-py3-none-any.whl", hash = "sha256:048298a2b06f91908444e3b4f1571ec48151799b67ce8190dfb11d6d8fdcb79a"},
+    {file = "foxy_entities-0.0.3.tar.gz", hash = "sha256:43e5ff550e658241f19c39e4d6db77050820d26f6c9f2b88c143fdeb291a7a97"},
 ]
 
 [[package]]
