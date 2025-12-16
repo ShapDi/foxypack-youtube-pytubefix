@@ -5,6 +5,8 @@ from typing import Any
 
 import regex
 from bs4 import BeautifulSoup, ResultSet, Tag
+from foxy_entities import EntitiesController
+from foxy_entities.exceptions import PresenceObjectException
 from foxypack import (
     FoxyStat,
     InternalCollectionException,
@@ -20,17 +22,27 @@ from foxypack_youtube_pytubefix.answers import (
     HeavyYoutubeVideoAnswersStatistics,
     YoutubeVideoAnswersStatistics,
 )
+from foxypack_youtube_pytubefix.entities import YoutubeProxy
 
 
 class YouTubeVideo(FoxyStat):
     def __init__(
         self,
+        entities_controller: EntitiesController | None = None,
         heavy_answers: bool = False,
     ):
         self._heavy_answers = heavy_answers
+        self._entities_controller = entities_controller
 
-    @staticmethod
-    def get_object_youtube(link: str) -> YouTube:
+    def get_object_youtube(self, link: str) -> YouTube:
+        if self._entities_controller is not None:
+            try:
+                proxy = self._entities_controller.get_entity(YoutubeProxy)
+                youtube = YouTube(link, "WEB", proxies=proxy.proxy_comparison())
+                self._entities_controller.add_entity(proxy)
+                return youtube
+            except PresenceObjectException:
+                pass
         youtube = YouTube(link, "WEB")
         return youtube
 
@@ -124,8 +136,10 @@ class YouTubeVideo(FoxyStat):
 class YouTubeChannel(FoxyStat):
     def __init__(
         self,
+        entities_controller: EntitiesController | None = None,
         heavy_answers: bool = False,
     ):
+        self._entities_controller = entities_controller
         self._heavy_answers = heavy_answers
 
     @staticmethod
@@ -140,9 +154,16 @@ class YouTubeChannel(FoxyStat):
         else:
             return url
 
-    @staticmethod
-    def get_object_youtube(link: str) -> Channel:
-        channel = Channel(link, "WEB", use_po_token=True)
+    def get_object_youtube(self, link: str) -> Channel:
+        if self._entities_controller is not None:
+            try:
+                proxy = self._entities_controller.get_entity(YoutubeProxy)
+                channel = Channel(link, "WEB", proxies=proxy.proxy_comparison())
+                self._entities_controller.add_entity(proxy)
+                return channel
+            except PresenceObjectException:
+                pass
+        channel = Channel(link, "WEB")
         return channel
 
     @staticmethod

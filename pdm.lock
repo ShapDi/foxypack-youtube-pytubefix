@@ -5,7 +5,7 @@
 groups = ["default", "dev", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:7db9c6b099ae301f26df170006941c5c802d1538dc06ba8f04a831bfcab79c35"
+content_hash = "sha256:914e58a9ba49b7f6a617e8b6895b01d8ec85930c33f2bf28e962f9dcc1f6b654"
 
 [[metadata.targets]]
 requires_python = "==3.11.*"
@@ -133,17 +133,15 @@ files = [
 
 [[package]]
 name = "foxy-entities"
-version = "0.0.2"
+version = "0.0.3"
 requires_python = ">=3.11"
+git = "ssh://git@github.com/ShapDi/foxy-entities.git"
+revision = "19ec3eaa91205b2aeb5950741f09cdf2a2af1e66"
 summary = "Library for managing social media entities"
 groups = ["default"]
 marker = "python_version == \"3.11\""
 dependencies = [
     "pydantic>=2.12.5",
-]
-files = [
-    {file = "foxy_entities-0.0.2-py3-none-any.whl", hash = "sha256:06d187fced115b2320767739fd5724be46b9da785fcc90bb8b75365a114c5b75"},
-    {file = "foxy_entities-0.0.2.tar.gz", hash = "sha256:d778b07ee139693f6b8e53bcd293bc4645c566387c0dde19cef79aa297628166"},
 ]
 
 [[package]]
@@ -557,6 +555,18 @@ marker = "python_version == \"3.11\""
 files = [
     {file = "soupsieve-2.8-py3-none-any.whl", hash = "sha256:0cc76456a30e20f5d7f2e14a98a4ae2ee4e5abdc7c5ea0aafe795f344bc7984c"},
     {file = "soupsieve-2.8.tar.gz", hash = "sha256:e2dd4a40a628cb5f28f6d4b0db8800b8f581b65bb380b97de22ba5ca8d72572f"},
+]
+
+[[package]]
+name = "types-regex"
+version = "2025.11.3.20251106"
+requires_python = ">=3.9"
+summary = "Typing stubs for regex"
+groups = ["dev"]
+marker = "python_version == \"3.11\""
+files = [
+    {file = "types_regex-2025.11.3.20251106-py3-none-any.whl", hash = "sha256:bbc37f8c2a81770f81ac8c36857ad81c7c88782ab157803f21de42f3fffc2d89"},
+    {file = "types_regex-2025.11.3.20251106.tar.gz", hash = "sha256:5f9828ed39a5a52727b637f93f7f0f909d56fa2211604ecc213fcebb509b9d50"},
 ]
 
 [[package]]

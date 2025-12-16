@@ -7,18 +7,6 @@ def content_analyzer():
     return FoxyYouTubeAnalysis()
 
 
-# @pytest.mark.analysis
-# def test_youtube_video_type_link_one(content_analyzer):
-#     assert content_analyzer.get_analysis(
-#         "https://youtu.be/dMPPMmUrYQM?si=_uGQVE6wtTXnVULv&t=32"
-#     ) == YoutubeAnswersAnalysis(
-#         url="https://youtube.com/watch?v=dMPPMmUrYQM",
-#         social_network="youtube",
-#         content_type="video",
-#         code="dMPPMmUrYQM",
-#     )
-
-
 @pytest.mark.analysis
 def test_youtube_video_type_link_two(content_analyzer):
     analysis = content_analyzer.get_analysis("https://youtu.be/GhXMLM7vUJI2")
