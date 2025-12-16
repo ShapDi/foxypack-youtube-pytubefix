@@ -5,7 +5,7 @@
 groups = ["default", "dev", "test"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:78b6dacf3ef98075b025f2a8815be24561c0afeb35135251d3bbacd865f563c4"
+content_hash = "sha256:7db9c6b099ae301f26df170006941c5c802d1538dc06ba8f04a831bfcab79c35"
 
 [[metadata.targets]]
 requires_python = "==3.11.*"
@@ -129,6 +129,21 @@ marker = "sys_platform == \"win32\" and python_version == \"3.11\""
 files = [
     {file = "colorama-0.4.6-py2.py3-none-any.whl", hash = "sha256:4f1d9991f5acc0ca119f9d443620b77f9d6b33703e51011c16baf57afb285fc6"},
     {file = "colorama-0.4.6.tar.gz", hash = "sha256:08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"},
+]
+
+[[package]]
+name = "foxy-entities"
+version = "0.0.2"
+requires_python = ">=3.11"
+summary = "Library for managing social media entities"
+groups = ["default"]
+marker = "python_version == \"3.11\""
+dependencies = [
+    "pydantic>=2.12.5",
+]
+files = [
+    {file = "foxy_entities-0.0.2-py3-none-any.whl", hash = "sha256:06d187fced115b2320767739fd5724be46b9da785fcc90bb8b75365a114c5b75"},
+    {file = "foxy_entities-0.0.2.tar.gz", hash = "sha256:d778b07ee139693f6b8e53bcd293bc4645c566387c0dde19cef79aa297628166"},
 ]
 
 [[package]]
