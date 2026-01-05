@@ -38,8 +38,6 @@ class YouTubeVideo(FoxyStat):
         if self._entities_controller is not None:
             try:
                 proxy = self._entities_controller.get_entity(YoutubeProxy)
-                print(proxy.proxy_comparison())
-
                 youtube = YouTube(link, "WEB", proxies=proxy.proxy_comparison())
                 self._entities_controller.add_entity(proxy)
                 return youtube
