@@ -58,14 +58,14 @@ class YouTubeVideo(FoxyStat):
 
     @override
     def get_statistics(
-        self, object_analysis: AnswersAnalysis
+        self, answers_analysis: AnswersAnalysis
     ) -> HeavyYoutubeVideoAnswersStatistics | YoutubeVideoAnswersStatistics:
-        if object_analysis.social_platform != "youtube" and (
-            object_analysis.social_platform != "shorts"
-            or object_analysis.social_platform != "video"
+        if answers_analysis.social_platform != "youtube" or (
+            answers_analysis.type_content != "shorts"
+            and answers_analysis.type_content != "video"
         ):
             raise InternalCollectionException
-        object_youtube = self.get_object_youtube(object_analysis.url)
+        object_youtube = self.get_object_youtube(answers_analysis.url)
         if self._heavy_answers:
             return HeavyYoutubeVideoAnswersStatistics(
                 title=object_youtube.title,
@@ -78,7 +78,7 @@ class YouTubeVideo(FoxyStat):
                 publish_date=object_youtube.publish_date.date(),
                 pytube_ob=object_youtube,
                 duration=object_youtube.length,
-                analysis_status=object_analysis,
+                analysis_status=answers_analysis,
             )
         else:
             return YoutubeVideoAnswersStatistics(
@@ -91,19 +91,19 @@ class YouTubeVideo(FoxyStat):
                 channel_url=object_youtube.channel_url,
                 publish_date=object_youtube.publish_date.date(),
                 duration=object_youtube.length,
-                analysis_status=object_analysis,
+                analysis_status=answers_analysis,
             )
 
     @override
     async def get_statistics_async(
-        self, object_analysis: AnswersAnalysis
+        self, answers_analysis: AnswersAnalysis
     ) -> HeavyYoutubeVideoAnswersStatistics | YoutubeVideoAnswersStatistics:
-        if object_analysis.social_platform != "youtube" and (
-            object_analysis.social_platform != "shorts"
-            or object_analysis.social_platform != "video"
+        if answers_analysis.social_platform != "youtube" or (
+            answers_analysis.type_content != "shorts"
+            and answers_analysis.type_content != "video"
         ):
             raise InternalCollectionException
-        object_youtube = self.get_object_youtube(object_analysis.url)
+        object_youtube = self.get_object_youtube(answers_analysis.url)
         if self._heavy_answers:
             return HeavyYoutubeVideoAnswersStatistics(
                 title=object_youtube.title,
@@ -116,7 +116,7 @@ class YouTubeVideo(FoxyStat):
                 publish_date=object_youtube.publish_date.date(),
                 pytube_ob=object_youtube,
                 duration=object_youtube.length,
-                analysis_status=object_analysis,
+                analysis_status=answers_analysis,
             )
         else:
             return YoutubeVideoAnswersStatistics(
@@ -129,7 +129,7 @@ class YouTubeVideo(FoxyStat):
                 channel_url=object_youtube.channel_url,
                 publish_date=object_youtube.publish_date.date(),
                 duration=object_youtube.length,
-                analysis_status=object_analysis,
+                analysis_status=answers_analysis,
             )
 
 
@@ -339,14 +339,14 @@ class YouTubeChannel(FoxyStat):
         ]
 
     def get_statistics(
-        self, object_analysis: AnswersAnalysis
+        self, answers_analysis: AnswersAnalysis
     ) -> HeavyYouTubeChannelAnswersStatistics | YouTubeChannelAnswersStatistics:
         if (
-            object_analysis.social_platform != "youtube"
-            and object_analysis.social_platform != "channel"
+            answers_analysis.social_platform != "youtube"
+            or answers_analysis.type_content != "channel"
         ):
             raise InternalCollectionException
-        object_youtube = self.get_object_youtube(object_analysis.url)
+        object_youtube = self.get_object_youtube(answers_analysis.url)
         if self._heavy_answers:
             return HeavyYouTubeChannelAnswersStatistics(
                 title=object_youtube.channel_name,
@@ -360,7 +360,7 @@ class YouTubeChannel(FoxyStat):
                 number_videos=self.get_number_videos(object_youtube),
                 pytube_ob=object_youtube,
                 external_link=self.get_external_links(object_youtube),
-                analysis_status=object_analysis,
+                analysis_status=answers_analysis,
             )
         else:
             return YouTubeChannelAnswersStatistics(
@@ -374,18 +374,18 @@ class YouTubeChannel(FoxyStat):
                 creation_date=self.get_data_create(object_youtube),
                 number_videos=self.get_number_videos(object_youtube),
                 external_link=self.get_external_links(object_youtube),
-                analysis_status=object_analysis,
+                analysis_status=answers_analysis,
             )
 
     async def get_statistics_async(
-        self, object_analysis: AnswersAnalysis
+        self, answers_analysis: AnswersAnalysis
     ) -> HeavyYouTubeChannelAnswersStatistics | YouTubeChannelAnswersStatistics:
         if (
-            object_analysis.social_platform != "youtube"
-            and object_analysis.social_platform != "channel"
+            answers_analysis.social_platform != "youtube"
+            or answers_analysis.type_content != "channel"
         ):
             raise InternalCollectionException
-        object_youtube = self.get_object_youtube(object_analysis.url)
+        object_youtube = self.get_object_youtube(answers_analysis.url)
         if self._heavy_answers:
             return HeavyYouTubeChannelAnswersStatistics(
                 title=object_youtube.channel_name,
@@ -399,7 +399,7 @@ class YouTubeChannel(FoxyStat):
                 number_videos=self.get_number_videos(object_youtube),
                 pytube_ob=object_youtube,
                 external_link=self.get_external_links(object_youtube),
-                analysis_status=object_analysis,
+                analysis_status=answers_analysis,
             )
         else:
             return YouTubeChannelAnswersStatistics(
@@ -413,7 +413,7 @@ class YouTubeChannel(FoxyStat):
                 creation_date=self.get_data_create(object_youtube),
                 number_videos=self.get_number_videos(object_youtube),
                 external_link=self.get_external_links(object_youtube),
-                analysis_status=object_analysis,
+                analysis_status=answers_analysis,
             )
 
 

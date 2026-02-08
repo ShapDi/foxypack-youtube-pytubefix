@@ -1,6 +1,6 @@
 [project]
 name = "foxypack-youtube-pytubefix"
-version = "0.0.7"
+version = "0.0.8"
 description = "YouTube Support Library for foxypack"
 authors = [
     {name = "shapdi", email = "shapranov.work@gmail.com"},
@@ -13,15 +13,15 @@ license = {text = "MIT"}
 [project.urls]
 repository = "https://github.com/ShapDi/foxypack-youtube-pytubefix"
 
-[project.optional-dependencies]
+[tool.pdm]
+distribution = true
+
+[dependency-groups]
 dev = [
-    "ruff>=0.13.3",
-    "mypy>=1.19.0",
-    "types-regex>=2025.11.3.20251106",
+    "ruff>=0.15.0",
+    "mypy>=1.19.1",
+    "types-regex>=2026.1.15.20260116",
 ]
 test = [
     "pytest>=9.0.2",
 ]
-[tool.pdm]
-distribution = true
-
