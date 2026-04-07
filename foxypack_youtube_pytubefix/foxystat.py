@@ -30,20 +30,24 @@ class YouTubeVideo(FoxyStat):
         self,
         entities_controller: EntitiesController | None = None,
         heavy_answers: bool = False,
+        auth: bool = False,
     ):
         self._heavy_answers = heavy_answers
         self._entities_controller = entities_controller
+        self._auth = auth
 
     def get_object_youtube(self, link: str) -> YouTube:
         if self._entities_controller is not None:
             try:
                 proxy = self._entities_controller.get_entity(YoutubeProxy)
-                youtube = YouTube(link, "WEB", proxies=proxy.proxy_comparison())
+                youtube = YouTube(
+                    link, "WEB", proxies=proxy.proxy_comparison(), use_oauth=self._auth
+                )
                 self._entities_controller.add_entity(proxy)
                 return youtube
             except PresenceObjectException:
                 pass
-        youtube = YouTube(link, "WEB")
+        youtube = YouTube(link, "WEB", use_oauth=self._auth)
         return youtube
 
     @staticmethod
@@ -138,9 +142,11 @@ class YouTubeChannel(FoxyStat):
         self,
         entities_controller: EntitiesController | None = None,
         heavy_answers: bool = False,
+        auth: bool = False,
     ):
         self._entities_controller = entities_controller
         self._heavy_answers = heavy_answers
+        self._auth = auth
 
     @staticmethod
     def transform_youtube_channel_link(url: str) -> str:
@@ -158,12 +164,14 @@ class YouTubeChannel(FoxyStat):
         if self._entities_controller is not None:
             try:
                 proxy = self._entities_controller.get_entity(YoutubeProxy)
-                channel = Channel(link, "WEB", proxies=proxy.proxy_comparison())
+                channel = Channel(
+                    link, "WEB", proxies=proxy.proxy_comparison(), use_oauth=self._auth
+                )
                 self._entities_controller.add_entity(proxy)
                 return channel
             except PresenceObjectException:
                 pass
-        channel = Channel(link, "WEB")
+        channel = Channel(link, "WEB", use_oauth=self._auth)
         return channel
 
     @staticmethod
