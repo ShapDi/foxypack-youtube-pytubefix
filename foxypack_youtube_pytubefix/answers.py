@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from enum import Enum
 from typing import List
 
 from pytubefix import YouTube, Channel
@@ -11,12 +10,6 @@ from foxypack.foxypack_abc.answers import (
     AnswersAnalysis,
     AnswersSocialContent,
 )
-
-
-class YouTubeEnum(Enum):
-    shorts = "shorts"
-    video = "video"
-    channel = "channel"
 
 
 @dataclass(slots=True, kw_only=True)

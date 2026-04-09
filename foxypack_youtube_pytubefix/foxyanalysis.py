@@ -1,71 +1,124 @@
 import urllib.parse
+from dataclasses import dataclass
 
-from foxypack import FoxyAnalysis, DenialAnalyticsException
 from typing_extensions import override
 
-from foxypack_youtube_pytubefix.answers import YoutubeAnswersAnalysis, YouTubeEnum
+from foxypack import FoxyAnalysis
+from foxypack_youtube_pytubefix.answers import YoutubeAnswersAnalysis
+from foxypack_youtube_pytubefix.enums import YouTubeHostEnum, YouTubeEnum
+from foxypack_youtube_pytubefix.exceptions import UnsupportedYouTubeUrlError
+
+
+@dataclass(frozen=True)
+class ParsedYouTubeLink:
+    clean_url: str
+    code: str
+    type_content: str
 
 
 class FoxyYouTubeAnalysis(FoxyAnalysis):
-    @staticmethod
-    def get_code(link: str) -> str:
-        parsed_url = urllib.parse.urlparse(link)
-        if "watch" in parsed_url.path:
-            query_params = urllib.parse.parse_qs(parsed_url.query).get("v")
-            if query_params is not None:
-                return query_params[0].split("?")[0]
-        elif "shorts" in parsed_url.path:
-            return parsed_url.path.split("/shorts/")[1].split("?")[0]
-        elif "@" in parsed_url.path:
-            return parsed_url.path.split("@")[1]
-        elif "channel" in parsed_url.path:
-            return parsed_url.path.split("channel/")[1]
-        elif "/" in parsed_url.path:
-            return parsed_url.path.split("/")[1]
-        return ""
+    """YouTube URL analyzer for videos, shorts and channels."""
 
     @staticmethod
-    def clean_link(link: str) -> str:
+    def _normalize_netloc(netloc: str) -> str:
+        return netloc.lower().strip()
+
+    @classmethod
+    def _is_youtube_host(cls, netloc: str) -> bool:
+        return YouTubeHostEnum.is_youtube_host(netloc)
+
+    @classmethod
+    def _parse_url(cls, link: str) -> ParsedYouTubeLink:
         parsed_url = urllib.parse.urlparse(link)
-        if "watch" in parsed_url.path:
-            query_params = urllib.parse.parse_qs(parsed_url.query).get("v")
-            if query_params is not None:
-                return f"https://youtube.com/watch?v={query_params[0].split('?')[0]}"
-        elif "shorts" in parsed_url.path:
-            shorts_id = parsed_url.path.split("/shorts/")[1].split("?")[0]
-            return f"https://youtube.com/watch?v={shorts_id}"
-        elif "@" in parsed_url.path:
-            return f"https://www.youtube.com/@{parsed_url.path.split('@')[1]}"
-        elif "channel" in parsed_url.path:
-            return (
-                f"https://www.youtube.com/channel{parsed_url.path.split('channel')[1]}"
+        netloc = cls._normalize_netloc(parsed_url.netloc)
+        path = parsed_url.path or ""
+        query = urllib.parse.parse_qs(parsed_url.query)
+
+        if not parsed_url.scheme or not netloc:
+            raise UnsupportedYouTubeUrlError(link)
+
+        if not cls._is_youtube_host(netloc):
+            raise UnsupportedYouTubeUrlError(link)
+
+        if netloc in {
+            YouTubeHostEnum.YOUTU_BE.value,
+            YouTubeHostEnum.WWW_YOUTU_BE.value,
+        }:
+            video_id = path.strip("/").split("/")[0]
+            if not video_id:
+                raise UnsupportedYouTubeUrlError(link)
+
+            return ParsedYouTubeLink(
+                clean_url=f"https://youtube.com/watch?v={video_id}",
+                code=video_id,
+                type_content=YouTubeEnum.video.value,
             )
-        elif "/" in parsed_url.path:
-            shorts_id = parsed_url.path.split("/")[1]
-            return f"https://youtube.com/watch?v={shorts_id}"
-        return parsed_url.scheme + "://" + parsed_url.netloc + parsed_url.path
 
-    @staticmethod
-    def get_type_content(link: str) -> str | None:
-        parsed_url = urllib.parse.urlparse(link)
-        if "watch" in parsed_url.path:
-            return YouTubeEnum.video.value
-        if "youtu.be" in parsed_url.netloc:
-            return YouTubeEnum.video.value
-        elif "shorts" in parsed_url.path:
-            return YouTubeEnum.shorts.value
-        elif "@" in parsed_url.path or "channel" in parsed_url.path:
-            return YouTubeEnum.channel.value
-        return None
+        if path == "/watch":
+            video_id_list = query.get("v")
+            if not video_id_list or not video_id_list[0]:
+                raise UnsupportedYouTubeUrlError(link)
+
+            video_id = video_id_list[0].split("?", 1)[0]
+            return ParsedYouTubeLink(
+                clean_url=f"https://youtube.com/watch?v={video_id}",
+                code=video_id,
+                type_content=YouTubeEnum.video.value,
+            )
+
+        if path.startswith("/shorts/"):
+            short_id = path.split("/shorts/", 1)[1].split("/", 1)[0].split("?", 1)[0]
+            if not short_id:
+                raise UnsupportedYouTubeUrlError(link)
+
+            return ParsedYouTubeLink(
+                clean_url=f"https://youtube.com/watch?v={short_id}",
+                code=short_id,
+                type_content=YouTubeEnum.shorts.value,
+            )
+
+        if path.startswith("/@"):
+            handle = path.split("/@", 1)[1].split("/", 1)[0].strip()
+            if not handle:
+                raise UnsupportedYouTubeUrlError(link)
+
+            return ParsedYouTubeLink(
+                clean_url=f"https://www.youtube.com/@{handle}",
+                code=handle,
+                type_content=YouTubeEnum.channel.value,
+            )
+
+        if path.startswith("/channel/"):
+            channel_id = path.split("/channel/", 1)[1].split("/", 1)[0].strip()
+            if not channel_id:
+                raise UnsupportedYouTubeUrlError(link)
+
+            return ParsedYouTubeLink(
+                clean_url=f"https://www.youtube.com/channel/{channel_id}",
+                code=channel_id,
+                type_content=YouTubeEnum.channel.value,
+            )
+
+        raise UnsupportedYouTubeUrlError(link)
+
+    @classmethod
+    def get_code(cls, link: str) -> str:
+        return cls._parse_url(link).code
+
+    @classmethod
+    def clean_link(cls, link: str) -> str:
+        return cls._parse_url(link).clean_url
+
+    @classmethod
+    def get_type_content(cls, link: str) -> str:
+        return cls._parse_url(link).type_content
 
     @override
     def get_analysis(self, url: str) -> YoutubeAnswersAnalysis:
-        type_content = self.get_type_content(url)
-        if type_content is None:
-            raise DenialAnalyticsException(url)
+        parsed = self._parse_url(url)
         return YoutubeAnswersAnalysis(
-            url=self.clean_link(url),
+            url=parsed.clean_url,
             social_platform="youtube",
-            type_content=type_content,
-            code=self.get_code(url),
+            type_content=parsed.type_content,
+            code=parsed.code,
         )
