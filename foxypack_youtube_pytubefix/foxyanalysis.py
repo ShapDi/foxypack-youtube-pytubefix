@@ -41,7 +41,7 @@ class FoxyYouTubeAnalysis(FoxyAnalysis):
             raise UnsupportedYouTubeUrlError(link)
 
         if netloc in {
-            YouTubeHostEnum.YOUTU_BE.value,
+            YouTubeHostEnum.YOU_TUBE.value,
             YouTubeHostEnum.WWW_YOUTU_BE.value,
         }:
             video_id = path.strip("/").split("/")[0]

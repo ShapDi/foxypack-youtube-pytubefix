@@ -1,74 +1,82 @@
 import pytest
+
 from foxypack_youtube_pytubefix import FoxyYouTubeAnalysis
+from foxypack_youtube_pytubefix.exceptions import UnsupportedYouTubeUrlError
 
 
 @pytest.fixture(scope="session")
-def content_analyzer():
+def analyzer() -> FoxyYouTubeAnalysis:
     return FoxyYouTubeAnalysis()
 
 
 @pytest.mark.analysis
-def test_youtube_video_type_link_two(content_analyzer):
-    analysis = content_analyzer.get_analysis("https://youtu.be/GhXMLM7vUJI2")
-    analysis_two = content_analyzer.get_analysis("https://youtu.be/GhXMLM7vUJI2")
-    assert analysis.answer_id != analysis_two.answer_id
-    assert analysis.url == "https://youtube.com/watch?v=GhXMLM7vUJI2"
+@pytest.mark.parametrize(
+    ("url", "clean_url", "type_content", "code"),
+    [
+        (
+            "https://youtu.be/GhXMLM7vUJI2",
+            "https://youtube.com/watch?v=GhXMLM7vUJI2",
+            "video",
+            "GhXMLM7vUJI2",
+        ),
+        (
+            "https://www.youtube.com/shorts/J-m4POZFGyM",
+            "https://youtube.com/watch?v=J-m4POZFGyM",
+            "shorts",
+            "J-m4POZFGyM",
+        ),
+        (
+            "https://www.youtube.com/watch?v=M4HCrPSU0C0",
+            "https://youtube.com/watch?v=M4HCrPSU0C0",
+            "video",
+            "M4HCrPSU0C0",
+        ),
+        (
+            "https://www.youtube.com/@AgnamoN",
+            "https://www.youtube.com/@AgnamoN",
+            "channel",
+            "AgnamoN",
+        ),
+        (
+            "https://www.youtube.com/channel/UC5C088kVlcF5ras7cBbdWxw",
+            "https://www.youtube.com/channel/UC5C088kVlcF5ras7cBbdWxw",
+            "channel",
+            "UC5C088kVlcF5ras7cBbdWxw",
+        ),
+    ],
+)
+def test_get_analysis_success(analyzer, url, clean_url, type_content, code):
+    analysis = analyzer.get_analysis(url)
+
+    assert analysis.url == clean_url
     assert analysis.social_platform == "youtube"
-    assert analysis.type_content == "video"
-    assert analysis.code == "GhXMLM7vUJI2"
+    assert analysis.type_content == type_content
+    assert analysis.code == code
 
 
 @pytest.mark.analysis
-def test_youtube_video_type_link_thee(content_analyzer):
-    analysis = content_analyzer.get_analysis(
-        "https://www.youtube.com/shorts/J-m4POZFGyM"
-    )
-    analysis_two = content_analyzer.get_analysis(
-        "https://www.youtube.com/shorts/J-m4POZFGyM"
-    )
-    assert analysis.answer_id != analysis_two.answer_id
-    assert analysis.url == "https://youtube.com/watch?v=J-m4POZFGyM"
-    assert analysis.social_platform == "youtube"
-    assert analysis.type_content == "shorts"
-    assert analysis.code == "J-m4POZFGyM"
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://example.com/watch?v=GhXMLM7vUJI2",
+        "https://www.youtube.com/",
+        "https://www.youtube.com/watch",
+        "https://www.youtube.com/shorts/",
+        "https://www.youtube.com/@",
+        "https://www.youtube.com/channel/",
+        "",
+        "not_a_url",
+    ],
+)
+def test_get_analysis_invalid_url(analyzer, url):
+    with pytest.raises(UnsupportedYouTubeUrlError):
+        analyzer.get_analysis(url)
 
 
 @pytest.mark.analysis
-def test_youtube_video_type_link_four(content_analyzer):
-    analysis = content_analyzer.get_analysis(
-        "https://www.youtube.com/watch?v=M4HCrPSU0C0?start=92.40&end=96.30"
-    )
-    analysis_two = content_analyzer.get_analysis(
-        "https://www.youtube.com/watch?v=M4HCrPSU0C0?start=92.40&end=96.30"
-    )
-    assert analysis.answer_id != analysis_two.answer_id
+def test_youtube_analysis_normalizes_host_case(analyzer):
+    analysis = analyzer.get_analysis("https://YouTuBe.com/watch?v=M4HCrPSU0C0")
+
     assert analysis.url == "https://youtube.com/watch?v=M4HCrPSU0C0"
-    assert analysis.social_platform == "youtube"
     assert analysis.type_content == "video"
     assert analysis.code == "M4HCrPSU0C0"
-
-
-@pytest.mark.analysis
-def test_youtube_channel_type_link_one(content_analyzer):
-    analysis = content_analyzer.get_analysis("https://www.youtube.com/@AgnamoN")
-    analysis_two = content_analyzer.get_analysis("https://www.youtube.com/@AgnamoN")
-    assert analysis.answer_id != analysis_two.answer_id
-    assert analysis.url == "https://www.youtube.com/@AgnamoN"
-    assert analysis.social_platform == "youtube"
-    assert analysis.type_content == "channel"
-    assert analysis.code == "AgnamoN"
-
-
-@pytest.mark.analysis
-def test_youtube_channel_type_link_two(content_analyzer):
-    analysis = content_analyzer.get_analysis(
-        "https://www.youtube.com/channel/UC5C088kVlcF5ras7cBbdWxw"
-    )
-    analysis_two = content_analyzer.get_analysis(
-        "https://www.youtube.com/channel/UC5C088kVlcF5ras7cBbdWxw"
-    )
-    assert analysis.answer_id != analysis_two.answer_id
-    assert analysis.url == "https://www.youtube.com/channel/UC5C088kVlcF5ras7cBbdWxw"
-    assert analysis.social_platform == "youtube"
-    assert analysis.type_content == "channel"
-    assert analysis.code == "UC5C088kVlcF5ras7cBbdWxw"

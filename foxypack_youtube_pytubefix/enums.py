@@ -11,7 +11,7 @@ class YouTubeHostEnum(str, Enum):
     YOUTUBE = "youtube.com"
     WWW_YOUTUBE = "www.youtube.com"
     M_YOUTUBE = "m.youtube.com"
-    YOUTU_BE = "youtu.be"
+    YOU_TUBE = "youtu.be"
     WWW_YOUTU_BE = "www.youtu.be"
 
     @classmethod
