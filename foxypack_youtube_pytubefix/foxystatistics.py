@@ -100,6 +100,25 @@ class YouTubeVideo(FoxyStatistics):
         except ValueError:
             return None
 
+    @staticmethod
+    def get_comments_num(youtube: YouTube) -> int | None:
+
+        try:
+            text = str(getattr(youtube, "initial_data", ""))
+
+            with open("initial_data.json", "w", encoding="utf-8") as f:
+                json.dump(youtube.initial_data, f, ensure_ascii=False, indent=2)
+            with open("initial_data2.txt", "w", encoding="utf-8") as f:
+                f.write(str(youtube.watch_html))
+            with open("data.txt", "w", encoding="utf-8") as f:
+                json.dump(youtube.likes, f, ensure_ascii=False, indent=2)
+        except Exception as exc:
+            print(exc)
+
+        return 0
+
+
+
     def _build_statistics(
         self,
         answers_analysis: AnswersAnalysis,
@@ -113,7 +132,7 @@ class YouTubeVideo(FoxyStatistics):
 
             payload = {
                 "title": object_youtube.title,
-                "likes": self.get_like_num(object_youtube),
+                "likes": object_youtube.likes,
                 "link": object_youtube.watch_url,
                 "channel_id": object_youtube.channel_id,
                 "views": object_youtube.views,
@@ -122,6 +141,7 @@ class YouTubeVideo(FoxyStatistics):
                 "publish_date": publish_date_value,
                 "duration": object_youtube.length,
                 "analysis_status": answers_analysis,
+                "comments": self.get_comments_num(object_youtube),
             }
 
             if self._heavy_answers:

@@ -1,28 +1,16 @@
 [project]
 name = "foxypack-youtube-pytubefix"
-version = "0.0.9"
-description = "YouTube Support Library for foxypack"
-authors = [
-    {name = "shapdi", email = "shapranov.work@gmail.com"},
-]
-dependencies = ["pytubefix>=10.3.6", "regex>=2025.9.18", "beautifulsoup4>=4.14.2", "foxy-entities>=0.0.3", "foxypack @ git+ssh://git@github.com/ShapDi/foxypack.git"]
-requires-python = ">=3.11"
+version = "0.1.0"
+description = "Add your description here"
 readme = "README.md"
-license = {text = "MIT"}
-
-[project.urls]
-repository = "https://github.com/ShapDi/foxypack-youtube-pytubefix"
-
-[tool.pdm]
-distribution = true
-
-[dependency-groups]
-dev = [
-    "ruff>=0.15.0",
-    "mypy>=1.19.1",
-    "types-regex>=2026.1.15.20260116",
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.15.0",
+    "foxy-entities>=0.0.3",
+    "foxypack",
+    "pytubefix>=10.10.1",
+    "regex>=2026.6.28",
 ]
-test = [
-    "pytest>=9.0.2",
-    "pytest-asyncio>=1.3.0",
-]
+
+[tool.uv.sources]
+foxypack = { git = "ssh://git@github.com/ShapDi/foxypack.git" }

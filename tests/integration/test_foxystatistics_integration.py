@@ -27,12 +27,15 @@ def test_video_statistics_real_watch_url(analyzer: FoxyYouTubeAnalysis):
     assert stat.system_id
     assert stat.title
     assert isinstance(stat.views, int)
+
     assert stat.views >= 0
     assert stat.channel_id
     assert stat.link.startswith("https://")
     assert stat.channel_url.startswith("https://")
     assert isinstance(stat.duration, int)
     assert stat.duration >= 0
+    # assert stat.comments >= 0
+    # print(stat.comments)
     assert stat.publish_date is None or isinstance(stat.publish_date, datetime.date)
 
 
@@ -43,7 +46,6 @@ def test_video_statistics_real_short_url(analyzer: FoxyYouTubeAnalysis):
     youtube_analysis = analyzer.get_analysis("https://youtu.be/PZHESOq-Gkw")
 
     stat = youtube_stat.get_statistics(youtube_analysis)
-
     assert isinstance(stat, YoutubeVideoAnswersStatistics)
     assert stat.system_id
     assert stat.title

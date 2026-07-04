@@ -64,12 +64,15 @@ def fake_channel_object():
 
 @pytest.mark.unit
 @pytest.mark.statistics
-def test_get_statistics_video_returns_expected_fields(monkeypatch, video_analysis, fake_video_object):
+def test_get_statistics_video_returns_expected_fields(
+    monkeypatch, video_analysis, fake_video_object
+):
     youtube_stat = YouTubeVideo()
-    monkeypatch.setattr(youtube_stat, "get_object_youtube", lambda link: fake_video_object)
+    monkeypatch.setattr(
+        youtube_stat, "get_object_youtube", lambda link: fake_video_object
+    )
 
     stat = youtube_stat.get_statistics(video_analysis)
-
     assert isinstance(stat, YoutubeVideoAnswersStatistics)
     assert stat.title == "Test Video"
     assert stat.likes == 4321
@@ -85,9 +88,13 @@ def test_get_statistics_video_returns_expected_fields(monkeypatch, video_analysi
 
 @pytest.mark.unit
 @pytest.mark.statistics
-def test_get_statistics_video_heavy_returns_heavy_answer(monkeypatch, video_analysis, fake_video_object):
+def test_get_statistics_video_heavy_returns_heavy_answer(
+    monkeypatch, video_analysis, fake_video_object
+):
     youtube_stat = YouTubeVideo(heavy_answers=True)
-    monkeypatch.setattr(youtube_stat, "get_object_youtube", lambda link: fake_video_object)
+    monkeypatch.setattr(
+        youtube_stat, "get_object_youtube", lambda link: fake_video_object
+    )
 
     stat = youtube_stat.get_statistics(video_analysis)
 
@@ -99,9 +106,13 @@ def test_get_statistics_video_heavy_returns_heavy_answer(monkeypatch, video_anal
 @pytest.mark.unit
 @pytest.mark.statistics
 @pytest.mark.asyncio
-async def test_get_statistics_video_async_returns_expected_fields(monkeypatch, video_analysis, fake_video_object):
+async def test_get_statistics_video_async_returns_expected_fields(
+    monkeypatch, video_analysis, fake_video_object
+):
     youtube_stat = YouTubeVideo()
-    monkeypatch.setattr(youtube_stat, "get_object_youtube", lambda link: fake_video_object)
+    monkeypatch.setattr(
+        youtube_stat, "get_object_youtube", lambda link: fake_video_object
+    )
 
     stat = await youtube_stat.get_statistics_async(video_analysis)
 
@@ -113,9 +124,13 @@ async def test_get_statistics_video_async_returns_expected_fields(monkeypatch, v
 
 @pytest.mark.unit
 @pytest.mark.statistics
-def test_get_statistics_video_supports_shorts(monkeypatch, shorts_analysis, fake_video_object):
+def test_get_statistics_video_supports_shorts(
+    monkeypatch, shorts_analysis, fake_video_object
+):
     youtube_stat = YouTubeVideo()
-    monkeypatch.setattr(youtube_stat, "get_object_youtube", lambda link: fake_video_object)
+    monkeypatch.setattr(
+        youtube_stat, "get_object_youtube", lambda link: fake_video_object
+    )
 
     stat = youtube_stat.get_statistics(shorts_analysis)
 
@@ -156,7 +171,9 @@ def test_get_statistics_video_raises_data_extraction_error(monkeypatch, video_an
         title="Broken Video",
         initial_data="like this video along with 1 other people",
     )
-    monkeypatch.setattr(youtube_stat, "get_object_youtube", lambda link: broken_video_object)
+    monkeypatch.setattr(
+        youtube_stat, "get_object_youtube", lambda link: broken_video_object
+    )
 
     with pytest.raises(YouTubeDataExtractionError):
         youtube_stat.get_statistics(video_analysis)
@@ -164,14 +181,20 @@ def test_get_statistics_video_raises_data_extraction_error(monkeypatch, video_an
 
 @pytest.mark.unit
 @pytest.mark.statistics
-def test_get_statistics_channel_returns_expected_fields(monkeypatch, channel_analysis_handle, fake_channel_object):
+def test_get_statistics_channel_returns_expected_fields(
+    monkeypatch, channel_analysis_handle, fake_channel_object
+):
     youtube_stat = YouTubeChannel()
 
-    monkeypatch.setattr(youtube_stat, "get_object_youtube", lambda link: fake_channel_object)
+    monkeypatch.setattr(
+        youtube_stat, "get_object_youtube", lambda link: fake_channel_object
+    )
     monkeypatch.setattr(youtube_stat, "get_country", lambda obj: "Japan")
     monkeypatch.setattr(youtube_stat, "get_view_count", lambda obj: 987654)
     monkeypatch.setattr(youtube_stat, "get_subscriber", lambda obj: 150000)
-    monkeypatch.setattr(youtube_stat, "get_data_create", lambda obj: datetime.date(2020, 3, 15))
+    monkeypatch.setattr(
+        youtube_stat, "get_data_create", lambda obj: datetime.date(2020, 3, 15)
+    )
     monkeypatch.setattr(youtube_stat, "get_number_videos", lambda obj: 120)
     monkeypatch.setattr(
         youtube_stat,
@@ -191,20 +214,28 @@ def test_get_statistics_channel_returns_expected_fields(monkeypatch, channel_ana
     assert stat.subscribers == 150000
     assert stat.creation_date == datetime.date(2020, 3, 15)
     assert stat.number_videos == 120
-    assert stat.external_link == [ExternalLink(title="Website", link="https://example.com")]
+    assert stat.external_link == [
+        ExternalLink(title="Website", link="https://example.com")
+    ]
     assert stat.analysis_status == channel_analysis_handle
 
 
 @pytest.mark.unit
 @pytest.mark.statistics
-def test_get_statistics_channel_heavy_returns_heavy_answer(monkeypatch, channel_analysis_handle, fake_channel_object):
+def test_get_statistics_channel_heavy_returns_heavy_answer(
+    monkeypatch, channel_analysis_handle, fake_channel_object
+):
     youtube_stat = YouTubeChannel(heavy_answers=True)
 
-    monkeypatch.setattr(youtube_stat, "get_object_youtube", lambda link: fake_channel_object)
+    monkeypatch.setattr(
+        youtube_stat, "get_object_youtube", lambda link: fake_channel_object
+    )
     monkeypatch.setattr(youtube_stat, "get_country", lambda obj: "Japan")
     monkeypatch.setattr(youtube_stat, "get_view_count", lambda obj: 987654)
     monkeypatch.setattr(youtube_stat, "get_subscriber", lambda obj: 150000)
-    monkeypatch.setattr(youtube_stat, "get_data_create", lambda obj: datetime.date(2020, 3, 15))
+    monkeypatch.setattr(
+        youtube_stat, "get_data_create", lambda obj: datetime.date(2020, 3, 15)
+    )
     monkeypatch.setattr(youtube_stat, "get_number_videos", lambda obj: 120)
     monkeypatch.setattr(youtube_stat, "get_external_links", lambda obj: [])
 
@@ -218,14 +249,20 @@ def test_get_statistics_channel_heavy_returns_heavy_answer(monkeypatch, channel_
 @pytest.mark.unit
 @pytest.mark.statistics
 @pytest.mark.asyncio
-async def test_get_statistics_channel_async_returns_expected_fields(monkeypatch, channel_analysis_handle, fake_channel_object):
+async def test_get_statistics_channel_async_returns_expected_fields(
+    monkeypatch, channel_analysis_handle, fake_channel_object
+):
     youtube_stat = YouTubeChannel()
 
-    monkeypatch.setattr(youtube_stat, "get_object_youtube", lambda link: fake_channel_object)
+    monkeypatch.setattr(
+        youtube_stat, "get_object_youtube", lambda link: fake_channel_object
+    )
     monkeypatch.setattr(youtube_stat, "get_country", lambda obj: "Japan")
     monkeypatch.setattr(youtube_stat, "get_view_count", lambda obj: 987654)
     monkeypatch.setattr(youtube_stat, "get_subscriber", lambda obj: 150000)
-    monkeypatch.setattr(youtube_stat, "get_data_create", lambda obj: datetime.date(2020, 3, 15))
+    monkeypatch.setattr(
+        youtube_stat, "get_data_create", lambda obj: datetime.date(2020, 3, 15)
+    )
     monkeypatch.setattr(youtube_stat, "get_number_videos", lambda obj: 120)
     monkeypatch.setattr(youtube_stat, "get_external_links", lambda obj: [])
 
@@ -247,13 +284,17 @@ def test_get_statistics_channel_invalid_analysis_type_raises(video_analysis):
 
 @pytest.mark.unit
 @pytest.mark.statistics
-def test_get_statistics_channel_raises_data_extraction_error(monkeypatch, channel_analysis_handle):
+def test_get_statistics_channel_raises_data_extraction_error(
+    monkeypatch, channel_analysis_handle
+):
     youtube_stat = YouTubeChannel()
     broken_channel_object = SimpleNamespace(
         channel_name="Broken Channel",
         channel_url="https://www.youtube.com/channel/BROKEN",
     )
-    monkeypatch.setattr(youtube_stat, "get_object_youtube", lambda link: broken_channel_object)
+    monkeypatch.setattr(
+        youtube_stat, "get_object_youtube", lambda link: broken_channel_object
+    )
 
     with pytest.raises(YouTubeDataExtractionError):
         youtube_stat.get_statistics(channel_analysis_handle)
