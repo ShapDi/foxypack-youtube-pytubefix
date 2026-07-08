@@ -14,3 +14,8 @@ dependencies = [
 
 [tool.uv.sources]
 foxypack = { git = "ssh://git@github.com/ShapDi/foxypack.git" }
+
+[dependency-groups]
+test = [
+    "pytest>=9.1.1",
+]

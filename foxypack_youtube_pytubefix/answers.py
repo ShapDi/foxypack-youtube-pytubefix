@@ -24,7 +24,6 @@ class YoutubeVideoAnswersStatistics(AnswersSocialContent):
     link: str
     channel_url: str
     duration: int
-    comments: int
 
 
 @dataclass(slots=True, kw_only=True)

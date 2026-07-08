@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from abc import ABC
+from os import cpu_count
 from typing import Literal
 
 from foxypack.foxypack_abc.foxysearch import FoxySearch
 from pytubefix.contrib.search import Filter, Search
 
+from foxypack_youtube_pytubefix.answers import YoutubeVideoAnswersStatistics
 
 UploadDate = Literal[
     "last_hour",
@@ -134,8 +135,34 @@ class FoxySearchKeyWord(FoxySearch):
 
         return builder
 
-    def get_search_result(self, query: str) -> Search:
-        return Search(
+    def get_search_result(
+            self,
+            query: str,
+    ) -> list[YoutubeVideoAnswersStatistics]:
+        search = Search(
             query=query,
             filters=self._build_filter(),
         )
+
+        result: list[YoutubeVideoAnswersStatistics] = []
+
+        for video in search.videos:
+            try:
+                result.append(
+                    YoutubeVideoAnswersStatistics(
+                        system_id=video.video_id,
+                        title=video.title,
+                        views=video.views,
+                        publish_date=video.publish_date,
+                        channel_id=video.channel_id,
+                        likes=video.likes,
+                        link=video.watch_url,
+                        channel_url=video.channel_url,
+                        duration=video.length,
+                        analysis_status=None
+                    )
+                )
+            except:
+                continue
+
+        return result

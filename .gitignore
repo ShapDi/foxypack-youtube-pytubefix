@@ -164,3 +164,4 @@ cython_debug/
 *.json
 *.xlsx
 
+simple_check_file.py
